@@ -23,6 +23,7 @@ import textures.TerrainTexturePack;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.Player;
 
 public class MainGameLoop {
 
@@ -44,9 +45,12 @@ public class MainGameLoop {
 		ModelData flowerData = OBJFileLoader.loadOBJ("fern");
 		RawModel flowerModel = loader.loadToVAO(flowerData.getVertices(), flowerData.getTextureCoords(), flowerData.getNormals(), flowerData.getIndices());
 		
+		ModelData bunnyData = OBJFileLoader.loadOBJ("bunny");
+		RawModel bunnyModel = loader.loadToVAO(bunnyData.getVertices(), bunnyData.getTextureCoords(), bunnyData.getNormals(), bunnyData.getIndices());
+		
 		
 		//Textured Models
-		TexturedModel staticModel = new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("lowPolyTree")));
+		TexturedModel tree = new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("lowPolyTree")));
 		
 		TexturedModel grass = new TexturedModel(grassModel, new ModelTexture(loader.loadTexture("grassTexture")));
 		grass.getTexture().setHasTransparency(true);
@@ -58,12 +62,16 @@ public class MainGameLoop {
 		TexturedModel flower = new TexturedModel(flowerModel, new ModelTexture(loader.loadTexture("flower")));
 		flower.getTexture().setHasTransparency(true);
 		
+		TexturedModel bunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("image_rainbow")));
+		bunny.getTexture().setShineDamper(10);
+		bunny.getTexture().setReflectivity(1);
+		
 		//Entities
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random();
 		
 		for(int i=0;i<500;i++){
-			entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
+			entities.add(new Entity(tree, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,.5f));
 			entities.add(new Entity(grass, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,1));
 			entities.add(new Entity(fern, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,0.6f));
 			entities.add(new Entity(flower, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,0.6f));
@@ -84,14 +92,20 @@ public class MainGameLoop {
 		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
 		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
 		
-		//Camera
-		Camera camera = new Camera();	
+		//renderer
 		MasterRenderer renderer = new MasterRenderer();
+		
+		//Player
+		Player player = new Player(bunny, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+		
+		//Camera
+		Camera camera = new Camera(player);	
 		
 		//Logic
 		while(!Display.isCloseRequested()){
 			camera.move();
-			
+			player.move();
+			renderer.processEntity(player);
 			renderer.processTerrain(terrain);
 			renderer.processTerrain(terrain2);
 			for(Entity entity:entities){
