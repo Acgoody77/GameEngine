@@ -45,8 +45,12 @@ public class MainGameLoop {
 		ModelData flowerData = OBJFileLoader.loadOBJ("fern");
 		RawModel flowerModel = loader.loadToVAO(flowerData.getVertices(), flowerData.getTextureCoords(), flowerData.getNormals(), flowerData.getIndices());
 		
+		/*
 		ModelData bunnyData = OBJFileLoader.loadOBJ("bunny");
 		RawModel bunnyModel = loader.loadToVAO(bunnyData.getVertices(), bunnyData.getTextureCoords(), bunnyData.getNormals(), bunnyData.getIndices());
+		*/
+		ModelData personData = OBJFileLoader.loadOBJ("person");
+		RawModel personModel = loader.loadToVAO(personData.getVertices(), personData.getTextureCoords(), personData.getNormals(), personData.getIndices());
 		
 		
 		//Textured Models
@@ -62,20 +66,9 @@ public class MainGameLoop {
 		TexturedModel flower = new TexturedModel(flowerModel, new ModelTexture(loader.loadTexture("flower")));
 		flower.getTexture().setHasTransparency(true);
 		
-		TexturedModel bunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("image_rainbow")));
-		bunny.getTexture().setShineDamper(10);
-		bunny.getTexture().setReflectivity(1);
-		
-		//Entities
-		List<Entity> entities = new ArrayList<Entity>();
-		Random random = new Random();
-		
-		for(int i=0;i<500;i++){
-			entities.add(new Entity(tree, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,.5f));
-			entities.add(new Entity(grass, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,1));
-			entities.add(new Entity(fern, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,0.6f));
-			entities.add(new Entity(flower, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,0.6f));
-		}
+		TexturedModel person = new TexturedModel(personModel, new ModelTexture(loader.loadTexture("playerTexture")));
+		person.getTexture().setShineDamper(10);
+		person.getTexture().setReflectivity(1);
 		
 		//Lights
 		Light light = new Light(new Vector3f(20000,40000,2000),new Vector3f(1,1,1));
@@ -89,22 +82,50 @@ public class MainGameLoop {
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
 		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
 		
-		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
-		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
+		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
+		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
+		
+		//Entities
+		List<Entity> entities = new ArrayList<Entity>();
+		Random random = new Random();
+		
+		for(int i=0;i<400;i++){
+			if(i % 20 == 0) {
+				float x = random.nextFloat()*800 - 400;
+				float z = random.nextFloat() * -600;
+				float y = terrain.getHeightOfTerrain(x, z);
+				entities.add(new Entity(fern, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
+			}
+			if(i % 5 == 0) {
+				float x = random.nextFloat()*800 - 400;
+				float z = random.nextFloat() * -600;
+				float y = terrain.getHeightOfTerrain(x, z);
+				entities.add(new Entity(tree, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
+				x = random.nextFloat()*800 - 400;
+				z = random.nextFloat() * -600;
+				y = terrain.getHeightOfTerrain(x, z);
+				entities.add(new Entity(grass, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,1));
+				x = random.nextFloat()*800 - 400;
+				z = random.nextFloat() * -600;
+				y = terrain.getHeightOfTerrain(x, z);
+				entities.add(new Entity(flower, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
+			}
+
+		}
 		
 		//renderer
 		MasterRenderer renderer = new MasterRenderer();
 		
 		//Player
-		Player player = new Player(bunny, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+		Player player = new Player(person, new Vector3f(100, 0, -50), 0, 0, 0, 1);
 		
 		//Camera
 		Camera camera = new Camera(player);	
 		
 		//Logic
 		while(!Display.isCloseRequested()){
+			player.move(terrain);
 			camera.move();
-			player.move();
 			renderer.processEntity(player);
 			renderer.processTerrain(terrain);
 			renderer.processTerrain(terrain2);
