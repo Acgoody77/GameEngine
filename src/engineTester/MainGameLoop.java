@@ -77,8 +77,10 @@ public class MainGameLoop {
 		person.getTexture().setReflectivity(1);
 		
 		//Lights
-		Light light = new Light(new Vector3f(20000,40000,2000),new Vector3f(1,1,1));
-		
+		List<Light> lights = new ArrayList<Light>();
+		lights.add(new Light(new Vector3f(0,10000,-7000),new Vector3f(1,1,1)));
+		lights.add(new Light(new Vector3f(-200,10,-200),new Vector3f(10,0,0)));
+		lights.add(new Light(new Vector3f(200,10,200),new Vector3f(0,0,10)));
 		//Terrains
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("dirt"));
@@ -148,7 +150,7 @@ public class MainGameLoop {
 			for(Entity entity:entities){
 				renderer.processEntity(entity);
 			}
-			renderer.render(light, camera);
+			renderer.render(lights, camera);
 			guiRenderer.render(guis);
 			DisplayManager.updateDisplay();
 		}
