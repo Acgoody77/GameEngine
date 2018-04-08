@@ -73,8 +73,8 @@ public class Terrain {
 		if(gridX + 1 >= heights.length -1 || gridZ + 1 >= heights.length - 1 || gridX < 0 || gridZ < 0) {
 			return 0;
 		}
-		float xCoord = (terrainX % gridSquareSize);
-		float zCoord = (terrainZ % gridSquareSize);
+		float xCoord = (terrainX % gridSquareSize) / gridSquareSize;
+		float zCoord = (terrainZ % gridSquareSize) / gridSquareSize;
 		float answer;
 		
 		if (xCoord <= (1-zCoord)) {

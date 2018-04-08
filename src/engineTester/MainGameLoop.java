@@ -76,11 +76,15 @@ public class MainGameLoop {
 		person.getTexture().setShineDamper(10);
 		person.getTexture().setReflectivity(1);
 		
+		
 		//Lights
 		List<Light> lights = new ArrayList<Light>();
-		lights.add(new Light(new Vector3f(0,10000,-7000),new Vector3f(1,1,1)));
-		lights.add(new Light(new Vector3f(-200,10,-200),new Vector3f(10,0,0)));
-		lights.add(new Light(new Vector3f(200,10,200),new Vector3f(0,0,10)));
+		lights.add(new Light(new Vector3f(0,1000,-7000),new Vector3f(0.2f,0.2f,0.2f)));//sun
+		lights.add(new Light(new Vector3f(185,10,-293),new Vector3f(2,0,0), new Vector3f(1, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(200,17,-200),new Vector3f(0,2,2), new Vector3f(1, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(293,7,-305),new Vector3f(2,2,0), new Vector3f(1, 0.01f, 0.002f)));
+		
+		
 		//Terrains
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("dirt"));
@@ -92,6 +96,7 @@ public class MainGameLoop {
 		
 		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
 		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
+		
 		
 		//Entities
 		List<Entity> entities = new ArrayList<Entity>();
@@ -122,7 +127,7 @@ public class MainGameLoop {
 		}
 		
 		//renderer
-		MasterRenderer renderer = new MasterRenderer();
+		MasterRenderer renderer = new MasterRenderer(loader);
 		
 		//Player
 		Player player = new Player(person, new Vector3f(100, 0, -50), 0, 0, 0, .5f);
@@ -146,7 +151,7 @@ public class MainGameLoop {
 			camera.move();
 			renderer.processEntity(player);
 			renderer.processTerrain(terrain);
-			renderer.processTerrain(terrain2);
+			//renderer.processTerrain(terrain2);
 			for(Entity entity:entities){
 				renderer.processEntity(entity);
 			}
