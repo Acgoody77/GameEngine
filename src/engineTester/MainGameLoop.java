@@ -92,7 +92,8 @@ public class MainGameLoop {
 		
 		//Lights
 		List<Light> lights = new ArrayList<Light>();
-		lights.add(new Light(new Vector3f(0,1000,-7000),new Vector3f(0.2f,0.2f,0.2f)));//sun
+		Light sun = (new Light(new Vector3f(0,1000,-7000),new Vector3f(0.2f,0.2f,0.2f)));
+		lights.add(sun);//sun
 		lights.add(new Light(new Vector3f(185,10,-293),new Vector3f(2,0,0), new Vector3f(1, 0.01f, 0.002f)));
 		lights.add(new Light(new Vector3f(200,17,-200),new Vector3f(0,2,2), new Vector3f(1, 0.01f, 0.002f)));
 		Light lampLight = (new Light(new Vector3f(293, 7, -305), new Vector3f(0, 2, 2), new Vector3f(1, 0.01f, 0.002f)));
@@ -169,7 +170,7 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(75, -75, 0);
+		WaterTile water = new WaterTile(200, -150, 0);
 		waters.add(water);
 		
 		
@@ -212,7 +213,7 @@ public class MainGameLoop {
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			fbos.unbindCurrentFrameBuffer();
 			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, 0, 0, 0));
-			waterRenderer.render(waters,  camera);
+			waterRenderer.render(waters,  camera, sun);
 			guiRenderer.render(guis);
 			DisplayManager.updateDisplay();
 		}
