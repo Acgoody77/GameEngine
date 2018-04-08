@@ -10,8 +10,11 @@ import objConverter.ModelData;
 import objConverter.OBJFileLoader;
 
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
@@ -22,6 +25,10 @@ import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.MousePicker;
+import water.WaterFrameBuffers;
+import water.WaterRenderer;
+import water.WaterShader;
+import water.WaterTile;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -93,6 +100,7 @@ public class MainGameLoop {
 		
 		
 		//Terrains
+		List<Terrain> terrains = new ArrayList<Terrain>();
 		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
 		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("dirt"));
 		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("pinkFlowers"));
@@ -103,30 +111,37 @@ public class MainGameLoop {
 		
 		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
 		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
+		terrains.add(terrain);
 		
 		
 		//Entities
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random();
 		
+		/*
+		 * 		  z
+		 * 	   x	-x
+		 *		 -z
+		 */
 		for(int i=0;i<400;i++){
-			if(i % 20 == 0) {
-				float x = random.nextFloat()*800 - 400;
-				float z = random.nextFloat() * -600;
+			if(i % 10 == 0) {
+				float x = random.nextFloat() * 800;
+				float z = random.nextFloat() * -800;
 				float y = terrain.getHeightOfTerrain(x, z);
-				entities.add(new Entity(fern, random.nextInt(4), new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));//atlas(use index)
+				entities.add(new Entity(fern, random.nextInt(4), new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.75f));//atlas(use index)
 			}
+			
 			if(i % 5 == 0) {
-				float x = random.nextFloat()*800 - 400;
-				float z = random.nextFloat() * -600;
+				float x = random.nextFloat() * 800;
+				float z = random.nextFloat() * -800;
 				float y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(tree, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
-				x = random.nextFloat()*800 - 400;
-				z = random.nextFloat() * -600;
+				x = random.nextFloat() * 800;
+				z = random.nextFloat() * -800;
 				y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(grass, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,1));
-				x = random.nextFloat()*800 - 400;
-				z = random.nextFloat() * -600;
+				x = random.nextFloat() * 800;
+				z = random.nextFloat() * -800;
 				y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(flower, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
 			}
@@ -140,47 +155,69 @@ public class MainGameLoop {
 		MasterRenderer renderer = new MasterRenderer(loader);
 		
 		//Player
-		Player player = new Player(person, new Vector3f(100, 0, -50), 0, 0, 0, .5f);
+		Player player = new Player(person, new Vector3f(400, 0, -400), 0, 0, 0, .5f);
+		entities.add(player);
 		
 		//Camera
 		Camera camera = new Camera(player);	
 		
-		//GUI's
-		List<GuiTexture> guis = new ArrayList<GuiTexture>();
-		GuiTexture healthBar = new GuiTexture(loader.loadTexture("health"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		GuiTexture thinMatrix = new GuiTexture(loader.loadTexture("thinmatrix"), new Vector2f(0.3f, 0.59f), new Vector2f(0.4f, 0.4f));
-		
-		guis.add(thinMatrix);
-		guis.add(healthBar);
-		
-		GuiRenderer guiRenderer = new GuiRenderer(loader);
-		
 		//MousePicker
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
+		
+		//Water
+		WaterFrameBuffers fbos = new WaterFrameBuffers();
+		WaterShader waterShader = new WaterShader();
+		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
+		List<WaterTile> waters = new ArrayList<WaterTile>();
+		WaterTile water = new WaterTile(75, -75, 0);
+		waters.add(water);
+		
+		
+		
+		//GUI's
+		List<GuiTexture> guis = new ArrayList<GuiTexture>();
+		GuiRenderer guiRenderer = new GuiRenderer(loader);
+		//GuiTexture healthBar = new GuiTexture(loader.loadTexture("health"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		//guis.add(healthBar);
 		
 		//Logic
 		while(!Display.isCloseRequested()){
 			player.move(terrain);
 			camera.move();
-			
 			picker.update();
+			
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+			/*
 			System.out.println(picker.getCurrentRay());
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if(terrainPoint!=null) {
 				lampEntity.setPosition(terrainPoint);
 				lampLight.setPosition(new Vector3f(terrainPoint.x, terrainPoint.y+15, terrainPoint.z));
 			}
+			*/
+			//render reflection texture
+			fbos.bindReflectionFrameBuffer();
+			float distance = 2 * (camera.getPosition().y - water.getHeight());
+			camera.getPosition().y -= distance;
+			camera.invertPitch();
+			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight()));
+			camera.getPosition().y += distance;
+			camera.invertPitch();
 			
-			renderer.processEntity(player);
-			renderer.processTerrain(terrain);
-			//renderer.processTerrain(terrain2);
-			for(Entity entity:entities){
-				renderer.processEntity(entity);
-			}
-			renderer.render(lights, camera);
+			//render refraction texture
+			fbos.bindRefractionFrameBuffer();
+			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()));
+			
+			//render to screen
+			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+			fbos.unbindCurrentFrameBuffer();
+			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, 0, 0, 0));
+			waterRenderer.render(waters,  camera);
 			guiRenderer.render(guis);
 			DisplayManager.updateDisplay();
 		}
+		fbos.cleanUp();
+		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();

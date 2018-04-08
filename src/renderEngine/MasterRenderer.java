@@ -10,6 +10,7 @@ import models.TexturedModel;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 
 import shaders.StaticShader;
 import shaders.TerrainShader;
@@ -22,12 +23,12 @@ import entities.Light;
 public class MasterRenderer {
 	
 	private static final float FOV = 70;
-	private static final float NEAR_PLANE = 0.1f;
+	private static final float NEAR_PLANE = .9f;//0.1f
 	private static final float FAR_PLANE = 1000;
 	
-	private static final float RED = 0.5f;
-	private static final float GREEN = 0.5f;
-	private static final float BLUE = 0.5f;
+	private static final float RED = 0.3f;
+	private static final float GREEN = 0.3f;
+	private static final float BLUE = 0.4f;
 	
 	private Matrix4f projectionMatrix;
 	
@@ -51,6 +52,16 @@ public class MasterRenderer {
 		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
 	}
 	
+	public void renderScene(List<Entity> entities, List<Terrain> terrains, List<Light> lights, Camera camera, Vector4f clipPlane) {
+		for(Terrain terrain : terrains) {
+			processTerrain(terrain);
+		}
+		for(Entity entity : entities) {
+			processEntity(entity);
+		}
+		render(lights, camera, clipPlane);
+	}
+	
 	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
@@ -64,15 +75,17 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
-	public void render(List<Light> lights,Camera camera){
+	public void render(List<Light> lights,Camera camera, Vector4f clipPlane){
 		prepare();
 		shader.start();
+		shader.loadClipPlane(clipPlane);
 		shader.loadSkyColor(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
 		renderer.render(entities);
 		shader.stop();
 		terrainShader.start();
+		terrainShader.loadClipPlane(clipPlane);
 		terrainShader.loadSkyColor(RED, GREEN, BLUE);
 		terrainShader.loadLights(lights);
 		terrainShader.loadViewMatrix(camera);

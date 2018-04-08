@@ -17,12 +17,17 @@ uniform vec3 lightPosition[4];
 
 uniform float useFakeLighting;
 
-const float density = 0.007;
-const float gradient = 1.5;
+const float density = 0.0033;
+const float gradient = 3.5;
+
+uniform vec4 plane;
 
 void main(void){
 
 	vec4 worldPosition = transformationMatrix * vec4(position,1.0);
+	
+	gl_ClipDistance[0] = dot(worldPosition, plane);
+	
 	vec4 positionRelativeToCam = viewMatrix * worldPosition;
 	gl_Position = projectionMatrix * positionRelativeToCam;
 	pass_textureCoordinates = textureCoordinates;
