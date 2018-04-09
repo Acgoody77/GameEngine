@@ -92,7 +92,7 @@ public class MainGameLoop {
 		
 		//Lights
 		List<Light> lights = new ArrayList<Light>();
-		Light sun = (new Light(new Vector3f(0,1000,-7000),new Vector3f(0.2f,0.2f,0.2f)));
+		Light sun = (new Light(new Vector3f(0,1000,-500),new Vector3f(0.7f,0.7f,0.7f)));
 		lights.add(sun);//sun
 		lights.add(new Light(new Vector3f(185,10,-293),new Vector3f(2,0,0), new Vector3f(1, 0.01f, 0.002f)));
 		lights.add(new Light(new Vector3f(200,17,-200),new Vector3f(0,2,2), new Vector3f(1, 0.01f, 0.002f)));
@@ -108,10 +108,10 @@ public class MainGameLoop {
 		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
 		
 		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
-		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
+		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("smallIslandBlendMap"));
 		
-		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "heightmap");
-		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
+		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "smallIsland");
+		//Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap, "heightmap");
 		terrains.add(terrain);
 		
 		
@@ -156,7 +156,7 @@ public class MainGameLoop {
 		MasterRenderer renderer = new MasterRenderer(loader);
 		
 		//Player
-		Player player = new Player(person, new Vector3f(400, 0, -400), 0, 0, 0, .5f);
+		Player player = new Player(person, new Vector3f(150, 0, -170), 0, 0, 0, .5f);
 		entities.add(player);
 		
 		//Camera
@@ -170,7 +170,7 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(200, -150, 0);
+		WaterTile water = new WaterTile(110, -110, 0);
 		waters.add(water);
 		
 		
@@ -201,13 +201,13 @@ public class MainGameLoop {
 			float distance = 2 * (camera.getPosition().y - water.getHeight());
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
-			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight()));
+			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight() + 1f));
 			camera.getPosition().y += distance;
 			camera.invertPitch();
 			
 			//render refraction texture
 			fbos.bindRefractionFrameBuffer();
-			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()));
+			renderer.renderScene(entities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight() + 1f));
 			
 			//render to screen
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);

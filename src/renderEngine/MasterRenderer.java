@@ -23,7 +23,7 @@ import entities.Light;
 public class MasterRenderer {
 	
 	private static final float FOV = 70;
-	private static final float NEAR_PLANE = .9f;//0.1f
+	private static final float NEAR_PLANE = .1f;//0.9f//change in Water fragment!
 	private static final float FAR_PLANE = 1000;
 	
 	private static final float RED = 0.3f;
