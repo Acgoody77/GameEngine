@@ -2,100 +2,38 @@ package entities;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 public class Camera {
 	
-	private Vector3f position = new Vector3f(0,0,0);
-	private float pitch;
-	private float yaw;
+	private float distanceFromPlayer = 50;
+	private float angleAroundPlayer = 0;
+	
+	private Vector3f position = new Vector3f(100,35,50);
+	private float pitch = 10;
+	private float yaw ;
 	private float roll;
-	private float speed;
 	
-	public Camera() {
-		
-		this.speed = 0.5f;
+	private Player player;
 	
+	public Camera(Player player){
+		this.player = player;
 	}
 	
-	public void move() {
-		
-		yaw =  - (Display.getWidth() - Mouse.getX() / 2);
-		pitch =  (Display.getHeight() / 2) - Mouse.getY();
-		
-		if (pitch >= 90)
-		{
-			
-			pitch = 90;
-			
-		}
-		else if (pitch <= -90)
-		{
-			
-			pitch = -90;
-			
-		}
-		
-		if (Keyboard.isKeyDown(Keyboard.KEY_W))
-		{
-
-			position.z += -(float)Math.cos(Math.toRadians(yaw)) * speed;
-			position.x += (float)Math.sin(Math.toRadians(yaw)) * speed;
-			
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_S))
-		{
-			position.z -= -(float)Math.cos(Math.toRadians(yaw)) * speed;
-			position.x -= (float)Math.sin(Math.toRadians(yaw)) * speed;
-
-
-		}
-
-		if (Keyboard.isKeyDown(Keyboard.KEY_D))
-		{
-			
-			position.z += (float)Math.sin(Math.toRadians(yaw)) * speed;
-			position.x += (float)Math.cos(Math.toRadians(yaw)) * speed;
-
-		}
-		else if (Keyboard.isKeyDown(Keyboard.KEY_A))
-		{
-			
-			position.z -= (float)Math.sin(Math.toRadians(yaw)) * speed;
-			position.x -= (float)Math.cos(Math.toRadians(yaw)) * speed;
-
-		}
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_E)) {
-			position.y += speed;
-		}
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-			position.y -= speed;
-		}
-		/*
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			position.z-=0.1f;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			position.z+=0.1f;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			position.x+=0.1f;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
-			position.x-=0.1f;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_E)) {
-			position.y+=0.1f;
-		}
-		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-			position.y-=0.1f;
-		}
-		*/
+	public void move(){
+		calculateZoom();
+		calculatePitch();
+		calculateAngleAroundPlayer();
+		float horizontalDistance = calculateHorizontalDistance();
+		float verticalDistance = calculateVerticalDistance();
+		calculateCameraPosition(horizontalDistance, verticalDistance);
+		this.yaw = 180 - (player.getRotY() + angleAroundPlayer);
 	}
 
+	public void invertPitch() {
+		this.pitch = -pitch;
+	}
+	
 	public Vector3f getPosition() {
 		return position;
 	}
@@ -111,5 +49,43 @@ public class Camera {
 	public float getRoll() {
 		return roll;
 	}
+	
+	private void calculateCameraPosition(float horizDistance, float verticDistance) {
+		float theta = player.getRotY() + angleAroundPlayer;
+		float offsetX = (float) (horizDistance * Math.sin(Math.toRadians(theta)));
+		float offsetZ = (float) (horizDistance * Math.cos(Math.toRadians(theta)));
+		position.x = player.getPosition().x - offsetX;
+		position.z = player.getPosition().z - offsetZ;
+		position.y = player.getPosition().y + verticDistance;
+	}
+	
+	private float calculateHorizontalDistance() {
+		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
+	}
+	
+	private float calculateVerticalDistance() {
+		return (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
+	}
+	
+	private void calculateZoom() {
+		float zoomLevel = Mouse.getDWheel() * 0.1f;
+		distanceFromPlayer -= zoomLevel;
+	}
+	
+	private void calculatePitch() {
+		if(Mouse.isButtonDown(1)) {
+			float pitchChange = Mouse.getDY() * 0.1f;
+			pitch -= pitchChange;
+		}
+	}
+	
+	private void calculateAngleAroundPlayer() {
+		if(Mouse.isButtonDown(0)) {
+			float angleChange = Mouse.getDX() * 0.3f;
+			angleAroundPlayer -= angleChange;
+		}
+	}
+	
+	
 
 }
