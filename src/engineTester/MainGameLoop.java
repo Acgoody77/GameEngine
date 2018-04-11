@@ -94,9 +94,9 @@ public class MainGameLoop {
 		List<Light> lights = new ArrayList<Light>();
 		Light sun = (new Light(new Vector3f(0,1000,-500),new Vector3f(0.7f,0.7f,0.7f)));
 		lights.add(sun);//sun
-		lights.add(new Light(new Vector3f(185,10,-293),new Vector3f(2,0,0), new Vector3f(1, 0.01f, 0.002f)));
-		lights.add(new Light(new Vector3f(200,17,-200),new Vector3f(0,2,2), new Vector3f(1, 0.01f, 0.002f)));
-		Light lampLight = (new Light(new Vector3f(293, 7, -305), new Vector3f(0, 2, 2), new Vector3f(1, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(130,10,-10),new Vector3f(2,0,0), new Vector3f(1, 0.01f, 0.002f)));
+		lights.add(new Light(new Vector3f(140,17,-10),new Vector3f(0,2,2), new Vector3f(1, 0.01f, 0.002f)));
+		Light lampLight = (new Light(new Vector3f(120, 7, -10), new Vector3f(0, 2, 2), new Vector3f(1, 0.01f, 0.002f)));
 		lights.add(lampLight);
 		
 		
@@ -124,32 +124,32 @@ public class MainGameLoop {
 		 * 	   x	-x
 		 *		 -z
 		 */
-		for(int i=0;i<400;i++){
+		for(int i=0;i<50;i++){
 			if(i % 10 == 0) {
-				float x = random.nextFloat() * 800;
-				float z = random.nextFloat() * -800;
+				float x = random.nextFloat() * 200;
+				float z = random.nextFloat() * -200;
 				float y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(fern, random.nextInt(4), new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.75f));//atlas(use index)
 			}
 			
 			if(i % 5 == 0) {
-				float x = random.nextFloat() * 800;
-				float z = random.nextFloat() * -800;
+				float x = random.nextFloat() * 200;
+				float z = random.nextFloat() * -200;
 				float y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(tree, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
-				x = random.nextFloat() * 800;
-				z = random.nextFloat() * -800;
+				x = random.nextFloat() * 200;
+				z = random.nextFloat() * -200;
 				y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(grass, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,1));
-				x = random.nextFloat() * 800;
-				z = random.nextFloat() * -800;
+				x = random.nextFloat() * 200;
+				z = random.nextFloat() * -200;
 				y = terrain.getHeightOfTerrain(x, z);
 				entities.add(new Entity(flower, new Vector3f(x,y,z),0,random.nextFloat() * 360,0,.5f));
 			}
 
 		}
 		
-		Entity lampEntity = new Entity(lamp, new Vector3f(293, -6.8f, -305), 0, 0, 0, 1);
+		Entity lampEntity = new Entity(lamp, new Vector3f(120, 3, -10), 0, 0, 0, 1);
 		entities.add(lampEntity);
 		
 		//renderer
