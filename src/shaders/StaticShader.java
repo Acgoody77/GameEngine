@@ -32,8 +32,6 @@ public class StaticShader extends ShaderProgram{
 	private int location_numberOfRows;
 	private int location_offset;
 	private int location_plane;
-	private int location_density;
-	private int location_gradient;
 
 	public StaticShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -58,8 +56,6 @@ public class StaticShader extends ShaderProgram{
 		location_numberOfRows = super.getUniformLocation("numberOfRows");
 		location_offset = super.getUniformLocation("offset");
 		location_plane = super.getUniformLocation("plane");
-		location_density = super.getUniformLocation("density");
-		location_gradient = super.getUniformLocation("gradient");
 		
 		location_lightPosition = new int[MAX_LIGHTS];
 		location_lightColour = new int[MAX_LIGHTS];
@@ -96,13 +92,6 @@ public class StaticShader extends ShaderProgram{
 	public void loadShineVariables(float damper,float reflectivity){
 		super.loadFloat(location_shineDamper, damper);
 		super.loadFloat(location_reflectivity, reflectivity);
-	}
-	public void loadDensity(float density) {
-		super.loadFloat(location_density, density);
-	}
-	
-	public void loadGradient(float gradient) {
-		super.loadFloat(location_gradient, gradient);
 	}
 	
 	public void loadTransformationMatrix(Matrix4f matrix){

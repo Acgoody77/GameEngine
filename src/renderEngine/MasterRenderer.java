@@ -30,11 +30,6 @@ public class MasterRenderer {
 	private static final float GREEN = 0.3f;
 	private static final float BLUE = 0.4f;
 	
-	private static final float GRADIENT = 0.0035f;
-	private static final float DENSITY = 10.0f;
-	private static final float GRADIENT_TERRAIN = .0033f;
-	private static final float DENSITY_TERRAIN = 3.5f;
-	
 	private Matrix4f projectionMatrix;
 	
 	private StaticShader shader = new StaticShader();
@@ -87,8 +82,6 @@ public class MasterRenderer {
 		shader.loadSkyColor(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
-		shader.loadDensity(DENSITY);
-		shader.loadGradient(GRADIENT);
 		renderer.render(entities);
 		shader.stop();
 		terrainShader.start();
@@ -96,8 +89,6 @@ public class MasterRenderer {
 		terrainShader.loadSkyColor(RED, GREEN, BLUE);
 		terrainShader.loadLights(lights);
 		terrainShader.loadViewMatrix(camera);
-		terrainShader.loadGradient(GRADIENT_TERRAIN);
-		terrainShader.loadDensity(DENSITY_TERRAIN);
 		terrainRenderer.render(terrains);
 		terrainShader.stop();
 		skyboxRenderer.render(camera, RED, GREEN, BLUE);

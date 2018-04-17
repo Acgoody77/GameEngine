@@ -19,8 +19,9 @@ uniform float useFakeLighting;
 
 uniform float numberOfRows;
 uniform vec2 offset;
-uniform float density;
-uniform float gradient;
+
+const float density = 0.0035;
+const float gradient = 10.0;
 
 uniform vec4 plane;
 

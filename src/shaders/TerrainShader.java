@@ -33,8 +33,6 @@ public class TerrainShader extends ShaderProgram{
 	private int location_bTexture;
 	private int location_blendMap;
 	private int location_plane;
-	private int location_density;
-	private int location_gradient;
 
 	public TerrainShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -62,8 +60,6 @@ public class TerrainShader extends ShaderProgram{
 		location_bTexture = super.getUniformLocation("bTexture");
 		location_blendMap = super.getUniformLocation("blendMap");
 		location_plane = super.getUniformLocation("plane");
-		location_density = super.getUniformLocation("density");
-		location_gradient = super.getUniformLocation("gradient");
 		
 		location_lightPosition = new int[MAX_LIGHTS];
 		location_lightColour = new int[MAX_LIGHTS];
@@ -104,14 +100,6 @@ public class TerrainShader extends ShaderProgram{
 	
 	public void loadTransformationMatrix(Matrix4f matrix){
 		super.loadMatrix(location_transformationMatrix, matrix);
-	}
-	
-	public void loadDensity(float density) {
-		super.loadFloat(location_density, density);
-	}
-	
-	public void loadGradient(float gradient) {
-		super.loadFloat(location_gradient, gradient);
 	}
 	
 	public void loadLights(List<Light> lights){
